@@ -1,0 +1,63 @@
+CEEJA • MINDAR PONG • TESTE 01
+================================
+
+OBJETIVO
+Testar somente uma coisa:
+A capa do PONG consegue substituir o marcador preto e ser reconhecida pelo MindAR?
+
+ESTE PACOTE AINDA NÃO CONTÉM O JOGO.
+Quando a capa for reconhecida, aparece:
+✅ PONG RECONHECIDO
+e um pequeno elemento AR ancorado à imagem.
+
+ARQUIVOS
+- index.html
+- pong-capa.jpg  (a capa final escolhida)
+- targets.mind   (VOCÊ VAI GERAR no compilador oficial do MindAR)
+- LEIA-ME.txt
+
+PASSO 1 — GERAR targets.mind
+Abra o compilador oficial:
+https://hiukim.github.io/mind-ar-js-doc/tools/compile/
+
+Suba EXATAMENTE o arquivo:
+pong-capa.jpg
+
+Depois:
+1. clique para iniciar a compilação;
+2. espere chegar a 100%;
+3. baixe o arquivo targets.mind.
+
+NÃO renomeie para pong.mind nesta versão.
+Deixe exatamente:
+targets.mind
+
+PASSO 2 — COLOCAR NO PROJETO
+Coloque targets.mind na MESMA pasta de index.html.
+
+A pasta deverá ficar:
+index.html
+pong-capa.jpg
+targets.mind
+LEIA-ME.txt
+
+PASSO 3 — GITHUB PAGES
+Suba esses quatro arquivos na raiz do repositório.
+Aguarde o deployment ficar verde.
+Abra a URL em HTTPS pelo celular.
+
+PASSO 4 — TESTE
+Permita a câmera.
+Aponte para a capa do Pong — impressa ou exibida em outra tela.
+Quando reconhecer, deverá aparecer:
+✅ PONG RECONHECIDO
+
+IMPORTANTE
+Este teste NÃO altera o Pong atual.
+É um projeto separado só para validar o image tracking do MindAR.
+
+Depois de funcionar, a próxima versão ligará:
+CAPA PONG -> jogo Pong
+e depois adicionaremos:
+CAPA ADVENTURE -> Adventure
+no mesmo targets.mind.

@@ -1,0 +1,1 @@
+Gere o arquivo targets.mind no compilador oficial usando pong-capa.jpg e coloque-o nesta pasta.
