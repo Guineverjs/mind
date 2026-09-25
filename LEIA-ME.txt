@@ -1,18 +1,54 @@
-CEEJA • MindAR Pong v0.2
+CEEJA • SCRATCHBOOK MULTI v0.1
+DUAS CAPAS / UM ÚNICO targets.mind
 
-Arquivos:
-- index.html = página principal
-- pong.sb3 = projeto Scratch local
-- pong-capa.jpg = imagem de referência da capa
-- targets.mind = VOCÊ deve colocar aqui o arquivo compilado no Image Targets Compiler
+OBJETIVO
+Provar que o mesmo site consegue reconhecer:
+1. capa do PONG
+2. capa do ADVENTURE
 
-Como publicar:
-1. Publique todos os arquivos na mesma pasta do GitHub Pages / Netlify.
-2. Garanta que o arquivo targets.mind esteja no mesmo nível do index.html.
-3. Abra o site no celular e permita o uso da câmera.
-4. Aponte para a capa do PONG.
-5. Quando o jogo aparecer, arraste o dedo sobre o jogo para mover a raquete.
+AINDA NÃO HÁ JOGOS NESTA VERSÃO.
+Primeiro validamos os dois targets juntos.
+Depois ligaremos:
+targetIndex 0 -> Pong
+targetIndex 1 -> Adventure
 
-Observação:
-- Esta versão usa a própria capa como alvo (sem marcador preto).
-- O botão VR foi ocultado.
+PASSO 1 — COMPILAR AS DUAS CAPAS JUNTAS
+No Image Targets Compiler do MindAR, adicione as imagens NESTA ORDEM:
+
+1º  01-pong-capa.jpg
+2º  02-adventure-capa.jpg
+
+A ordem é essencial porque:
+targetIndex 0 = primeira imagem
+targetIndex 1 = segunda imagem
+
+Depois clique em Download compiled.
+O arquivo deve ser salvo como:
+targets.mind
+
+PASSO 2 — PASTA FINAL
+Antes de publicar, deixe assim:
+
+index.html
+01-pong-capa.jpg
+02-adventure-capa.jpg
+targets.mind
+LEIA-ME.txt
+
+PASSO 3 — NOVO REPOSITÓRIO
+Sugestão:
+scratchbook-multi
+
+Ative GitHub Pages:
+main -> /(root)
+
+PASSO 4 — TESTAR
+Abra o site no celular.
+Aponte para a capa Pong:
+deve aparecer "PONG RECONHECIDO".
+
+Depois aponte para Adventure:
+deve aparecer "ADVENTURE RECONHECIDO".
+
+Se os dois forem reconhecidos corretamente, a próxima versão será:
+Pong + Adventure reais no MESMO site.

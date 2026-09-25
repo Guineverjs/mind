@@ -1,0 +1,10 @@
+IMPORTANTE
+
+No compilador MindAR, envie exatamente nesta ordem:
+
+1. 01-pong-capa.jpg
+2. 02-adventure-capa.jpg
+
+Resultado esperado:
+targetIndex 0 = PONG
+targetIndex 1 = ADVENTURE

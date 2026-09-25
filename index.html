@@ -1,303 +1,112 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>CEEJA • MindAR Pong v0.5 • otimizado</title>
-<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turbowarp/scaffolding@0.4.0/dist/scaffolding-min.js"></script>
-<style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none;font-family:Arial,sans-serif}
-#top{position:fixed;left:12px;right:12px;top:12px;z-index:9999;padding:10px 14px;border-radius:14px;background:rgba(0,0,0,.72);color:#fff;text-align:center;font-size:14px;line-height:1.35}
-#status{position:fixed;z-index:9999;left:14px;right:14px;bottom:14px;padding:11px 14px;border-radius:14px;background:rgba(9,19,28,.82);color:#fff;text-align:center;font-size:14px;pointer-events:none}
-#gameWrap{position:fixed;z-index:9000;left:0;top:0;width:480px;height:360px;transform-origin:center center;will-change:transform;display:none;border-radius:18px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,.45);background:#fff;pointer-events:auto;touch-action:none}
-#project{position:absolute;inset:0;width:100%;height:100%;background:#fff;pointer-events:auto;touch-action:none}
-#hint{position:absolute;left:8px;right:8px;bottom:7px;text-align:center;color:#fff;background:rgba(0,0,0,.58);padding:5px;border-radius:10px;font-size:12px;pointer-events:none}
-#hud{position:absolute;z-index:7;left:10px;top:8px;display:flex;gap:8px;background:rgba(0,0,0,.62);color:#fff;padding:6px 9px;border-radius:12px;font:bold 15px Arial;pointer-events:none}
-#gameOver{position:absolute;z-index:20;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,8,14,.82);color:white;text-align:center;padding:20px;box-sizing:border-box}
-#gameOver .box{background:rgba(0,0,0,.55);padding:18px;border-radius:18px;min-width:230px}
-#gameOver .title{font:bold 25px Arial;margin-bottom:8px}
-#restartBtn{margin-top:12px;border:0;border-radius:14px;padding:11px 18px;font:bold 16px Arial;background:white;color:#111}
-#touchDot{position:absolute;z-index:5;width:24px;height:24px;border-radius:50%;border:3px solid white;background:#ffeb3b;display:none;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 12px #000}
-#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#111;color:white;font-weight:700;z-index:3;pointer-events:none}
-.a-enter-vr{display:none!important}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>CEEJA ScratchBook Multi v0.1</title>
 
-#arContainer{
-  overflow:hidden;
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-}
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-</style>
-<script>
-let scratchReady=false, scratchLoading=false, scaffolding=null;
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif}
+    #top{
+      position:fixed;left:12px;right:12px;top:12px;z-index:9999;
+      padding:10px 14px;border-radius:14px;
+      background:rgba(0,0,0,.72);color:#fff;text-align:center;
+      font-size:14px;line-height:1.35
+    }
+    #status{
+      position:fixed;left:14px;right:14px;bottom:14px;z-index:9999;
+      padding:11px 14px;border-radius:14px;
+      background:rgba(9,19,28,.82);color:#fff;text-align:center;
+      font-size:14px;font-weight:700;pointer-events:none
+    }
+    #badge{
+      position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+      z-index:9998;display:none;padding:14px 20px;border-radius:18px;
+      background:rgba(0,0,0,.78);color:#fff;font:bold 18px Arial;
+      pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.35)
+    }
+    #arContainer{
+      overflow:hidden;position:absolute;inset:0;width:100%;height:100%;
+    }
+    .a-enter-vr{display:none!important}
+  </style>
 
-async function loadLocalPong(){
- if(scratchReady||scratchLoading)return;
- scratchLoading=true;
- const loading=document.getElementById('loading');
- try{
-   scaffolding=new Scaffolding.Scaffolding();
-   scaffolding.width=480; scaffolding.height=360;
-   scaffolding.resizeMode='preserve-ratio';
-   scaffolding.setup();
-   scaffolding.appendTo(document.getElementById('project'));
+  <script>
+    AFRAME.registerComponent('multi-target-events',{
+      schema:{name:{type:'string'}},
+      init:function(){
+        const status=document.getElementById('status');
+        const badge=document.getElementById('badge');
+        const name=this.data.name;
 
-   // O tamanho interno do palco é fixo; não precisamos recalcular layout a cada frame.
-   const relayoutScratch=()=>{
-     if(scaffolding && scaffolding.relayout){
-       try{scaffolding.relayout();}catch(e){}
-     }
-   };
-   window.addEventListener('resize',relayoutScratch,{passive:true});
-   window.addEventListener('orientationchange',()=>setTimeout(relayoutScratch,250),{passive:true});
-   setTimeout(relayoutScratch,50);
-   const response=await fetch('./pong.sb3',{cache:'no-store'});
-   if(!response.ok)throw new Error('pong.sb3 HTTP '+response.status);
-   const project=await response.arrayBuffer();
-   await scaffolding.loadProject(project);
+        this.el.addEventListener('targetFound',()=>{
+          if(name==='PONG'){
+            status.textContent='🎮 PONG reconhecido — targetIndex 0';
+            badge.textContent='🎮 PONG RECONHECIDO';
+          }else{
+            status.textContent='🐱 ADVENTURE reconhecido — targetIndex 1';
+            badge.textContent='🐱 ADVENTURE RECONHECIDO';
+          }
+          badge.style.display='block';
+          if(navigator.vibrate) navigator.vibrate(50);
+        });
 
-   const dot=document.getElementById('touchDot');
-   const runtime=scaffolding.vm.runtime;
-   const stageTarget=runtime.getTargetForStage();
-   const raVariable=stageTarget && stageTarget.lookupVariableByNameAndType ? stageTarget.lookupVariableByNameAndType('RA_X','') : null;
-   let paddleTarget=runtime.targets.find(t => !t.isStage && t.sprite && t.sprite.name==='Paddle' && (t.isOriginal===undefined || t.isOriginal)) || null;
-
-   function localScratchX(clientX,clientY){
-     const tr=window.__scratchSurfaceTransform;
-     if(!tr) return Math.max(-220,Math.min(220,(clientX/window.innerWidth)*440-220));
-     const dx=clientX-tr.cx, dy=clientY-tr.cy;
-     const lx=dx/tr.sx + 240;
-     return Math.max(-220,Math.min(220,lx-240));
-   }
-
-   function showDot(clientX,clientY){
-     const tr=window.__scratchSurfaceTransform;
-     if(!tr) return;
-     const dx=clientX-tr.cx, dy=clientY-tr.cy;
-     const lx=dx/tr.sx + 240;
-     const ly=dy/tr.sy + 180;
-     dot.style.display='block';
-     dot.style.left=(Math.max(0,Math.min(480,lx))/480*100)+'%';
-     dot.style.top=(Math.max(0,Math.min(360,ly))/360*100)+'%';
-   }
-
-   function applyControl(clientX,clientY){
-     if(document.getElementById('gameOver').style.display==='flex') return;
-     const x=localScratchX(clientX,clientY);
-     showDot(clientX,clientY);
-     if(raVariable) raVariable.value=x;
-     if(!paddleTarget){
-       paddleTarget=runtime.targets.find(t => !t.isStage && t.sprite && t.sprite.name==='Paddle') || null;
-     }
-     if(paddleTarget && typeof paddleTarget.setXY==='function'){
-       paddleTarget.setXY(x,paddleTarget.y,true);
-       if(scaffolding.renderer && scaffolding.renderer.draw) scaffolding.renderer.draw();
-     }
-   }
-
-   const isGameOverControl=e=>{
-     const go=document.getElementById('gameOver');
-     return go && go.style.display==='flex' && e.target && e.target.closest && e.target.closest('#gameOver');
-   };
-
-   const onTouchStart=e=>{
-     if(isGameOverControl(e)) return;
-     if(document.getElementById('gameWrap').style.display==='none') return;
-     if(e.touches && e.touches[0]) applyControl(e.touches[0].clientX,e.touches[0].clientY);
-     e.preventDefault();
-   };
-   let pendingTouch=null, touchRAF=0;
-   const flushTouch=()=>{
-     touchRAF=0;
-     if(!pendingTouch) return;
-     applyControl(pendingTouch.x,pendingTouch.y);
-     pendingTouch=null;
-   };
-   const onTouchMove=e=>{
-     if(isGameOverControl(e)) return;
-     if(document.getElementById('gameWrap').style.display==='none') return;
-     if(e.touches && e.touches[0]){
-       pendingTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};
-       if(!touchRAF) touchRAF=requestAnimationFrame(flushTouch);
-     }
-     e.preventDefault();
-   };
-   const onTouchEnd=e=>{
-     if(isGameOverControl(e)) return;
-     setTimeout(()=>dot.style.display='none',180);
-     e.preventDefault();
-   };
-   document.addEventListener('touchstart',onTouchStart,{passive:false,capture:true});
-   document.addEventListener('touchmove',onTouchMove,{passive:false,capture:true});
-   document.addEventListener('touchend',onTouchEnd,{passive:false,capture:true});
-   document.addEventListener('pointermove',e=>{
-     if(document.getElementById('gameWrap').style.display==='none') return;
-     if(e.pointerType!=='touch' && (e.buttons || e.pointerType==='pen')) applyControl(e.clientX,e.clientY);
-   },true);
-
-   scaffolding.greenFlag();
-   const livesHud=document.getElementById('livesHud');
-   const scoreHud=document.getElementById('scoreHud');
-   const gameOver=document.getElementById('gameOver');
-   const finalScore=document.getElementById('finalScore');
-   const restartBtn=document.getElementById('restartBtn');
-
-   function readVar(name){
-     const st=scaffolding.vm.runtime.getTargetForStage();
-     const v=st && st.lookupVariableByNameAndType ? st.lookupVariableByNameAndType(name,'') : null;
-     return v ? Number(v.value) : 0;
-   }
-   function refreshHud(){
-     const vidas=readVar('Vidas');
-     const pontos=readVar('Pontos');
-     livesHud.textContent='❤️ '+vidas;
-     scoreHud.textContent='⭐ '+pontos;
-     if(vidas<=0 && scratchReady){
-       gameOver.style.display='flex';
-       finalScore.textContent='⭐ '+pontos+(pontos===1?' ponto':' pontos');
-     }
-   }
-   if(window.__pongHudTimer) clearInterval(window.__pongHudTimer);
-   window.__pongHudTimer=setInterval(refreshHud,160);
-
-   let restartBusy=false;
-   function restartGame(e){
-     if(e){e.preventDefault(); e.stopPropagation();}
-     if(restartBusy) return;
-     restartBusy=true;
-     gameOver.style.display='none';
-     dot.style.display='none';
-     try{scaffolding.greenFlag();}catch(err){console.error('Erro ao reiniciar:',err);}
-     setTimeout(()=>{refreshHud(); document.getElementById('status').textContent='🎮 Novo jogo • 3 vidas • arraste para mover a raquete'; restartBusy=false;},220);
-   }
-   restartBtn.addEventListener('pointerup',restartGame);
-   restartBtn.addEventListener('click',restartGame);
-
-   scratchReady=true;
-   loading.style.display='none';
-   document.getElementById('status').textContent='🎮 Pong carregado • aponte para a capa e arraste para jogar';
- }catch(e){
-   loading.textContent='Erro ao carregar Pong';
-   document.getElementById('status').textContent='⚠️ Não foi possível carregar o Pong: '+e.message;
-   console.error(e);
- }finally{ scratchLoading=false; }
-}
-
-AFRAME.registerComponent('scratch-surface-mindar',{
- init:function(){
-   this.wrap=document.getElementById('gameWrap');
-   this.status=document.getElementById('status');
-   this.targetVisible=false;
-   this.filterReady=false;
-   this.fx=0; this.fy=0; this.fs=1;
-   this.POS_LERP=0.18;
-   this.SCALE_LERP=0.13;
-
-   this.el.addEventListener('targetFound',()=>{
-     this.targetVisible=true;
-     this.filterReady=false;
-     this.wrap.style.display='block';
-     this.status.textContent=scratchReady ? '🎮 Capa reconhecida • arraste para mover a raquete' : '⏳ Capa reconhecida • carregando Pong...';
-     loadLocalPong();
-   });
-
-   this.el.addEventListener('targetLost',()=>{
-     this.targetVisible=false;
-     this.filterReady=false;
-     this.wrap.style.display='none';
-     this.status.textContent='📷 Aponte para a capa do PONG';
-   });
- },
- tick:function(time){
-   if(!this.targetVisible || this.wrap.style.display==='none') return;
-
-   // Atualiza a posição do jogo em ~30 fps.
-   // O MindAR continua rastreando normalmente; reduzimos apenas o custo do overlay HTML.
-   if(this.lastTick && (time-this.lastTick)<33) return;
-   this.lastTick=time;
-
-   const cam=this.el.sceneEl.camera;
-   if(!cam) return;
-   const W=innerWidth, H=innerHeight;
-   const obj=this.el.object3D;
-
-   const project=(x,y,z)=>{
-     const p=new THREE.Vector3(x,y,z);
-     obj.localToWorld(p);
-     p.project(cam);
-     return {x:(p.x*.5+.5)*W, y:(-.5*p.y+.5)*H};
-   };
-
-   const c=project(0,0,0);
-   const l=project(-0.5,0,0);
-   const r=project(0.5,0,0);
-   const t=project(0,0.75,0);
-   const b=project(0,-0.75,0);
-
-   const projectedW=Math.max(180,Math.hypot(r.x-l.x,r.y-l.y)*1.18);
-   const projectedH=Math.max(135,Math.hypot(b.x-t.x,b.y-t.y)*0.88);
-   let targetScale=Math.sqrt((projectedW/480)*(projectedH/360));
-   targetScale=Math.max(0.42,Math.min(1.35,targetScale));
-
-   let targetX=c.x;
-   let targetY=c.y;
-
-   if(!this.filterReady){
-     this.fx=targetX; this.fy=targetY; this.fs=targetScale; this.filterReady=true;
-   }else{
-     const maxPosStep=Math.max(55,Math.min(W,H)*0.12);
-     const dx=Math.max(-maxPosStep,Math.min(maxPosStep,targetX-this.fx));
-     const dy=Math.max(-maxPosStep,Math.min(maxPosStep,targetY-this.fy));
-     const maxScaleStep=0.16;
-     const ds=Math.max(-maxScaleStep,Math.min(maxScaleStep,targetScale-this.fs));
-     this.fx += dx*this.POS_LERP;
-     this.fy += dy*this.POS_LERP;
-     this.fs += ds*this.SCALE_LERP;
-   }
-
-   this.wrap.style.transform=`translate3d(${this.fx-240}px,${this.fy-180}px,0) scale(${this.fs})`;
-   window.__scratchSurfaceTransform={cx:this.fx, cy:this.fy, angRad:0, sx:this.fs, sy:this.fs};
-   /* relayout removido do loop: o gameWrap muda só por CSS transform. */
- }
-});
-
-window.addEventListener('error',(e)=>{
-  const status=document.getElementById('status');
-  if(!status) return;
-  const msg=String(e.message||'');
-  if(msg.includes('mind')||msg.includes('fetch')) status.textContent='⚠️ Verifique se targets.mind está na mesma pasta do index.html';
-});
-</script>
+        this.el.addEventListener('targetLost',()=>{
+          badge.style.display='none';
+          status.textContent='📷 Aponte para uma das duas capas';
+        });
+      }
+    });
+  </script>
 </head>
+
 <body>
-<div id="top"><strong>CEEJA • MindAR Pong v0.5</strong><br>Capa do Pong como alvo • versão otimizada para celulares.</div>
-<div id="status">📷 Aponte para a capa do PONG</div>
-<div id="gameWrap">
-  <div id="project"></div>
-  <div id="hud"><span id="livesHud">❤️ 3</span><span id="scoreHud">⭐ 0</span></div>
-  <div id="gameOver"><div class="box"><div class="title">Fim de jogo</div><div id="finalScore">⭐ 0 pontos</div><button id="restartBtn">Jogar novamente</button></div></div>
-  <div id="touchDot"></div>
-  <div id="loading">Carregando Pong…</div>
-  <div id="hint">👆 Arraste o dedo sobre o jogo para mover a raquete</div>
-</div>
-<div id="arContainer">
-<a-scene
-  mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; maxTrack: 1; filterMinCF: 0.001; filterBeta: 0.01; warmupTolerance: 5; missTolerance: 5;"
-  color-space="sRGB"
-  renderer="antialias: false; colorManagement: false"
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false"
-  embedded>
+  <div id="top">
+    <strong>CEEJA • ScratchBook Multi v0.1</strong><br>
+    Teste de duas capas no mesmo arquivo targets.mind
+  </div>
 
-  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  <div id="status">📷 Aponte para a capa do PONG ou ADVENTURE</div>
+  <div id="badge"></div>
 
-  <a-entity mindar-image-target="targetIndex: 0" scratch-surface-mindar>
-  </a-entity>
-</a-scene>
-</div>
+  <div id="arContainer">
+    <a-scene
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; maxTrack: 1; filterMinCF: 0.001; filterBeta: 0.01; warmupTolerance: 5; missTolerance: 5;"
+      color-space="sRGB"
+      renderer="antialias: false; colorManagement: false"
+      vr-mode-ui="enabled:false"
+      device-orientation-permission-ui="enabled:false"
+      embedded>
+
+      <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+
+      <!-- ORDEM DO COMPILADOR:
+           targetIndex 0 = 01-pong-capa.jpg
+           targetIndex 1 = 02-adventure-capa.jpg
+      -->
+
+      <a-entity mindar-image-target="targetIndex:0"
+                multi-target-events="name:PONG">
+        <a-ring position="0 0 0.05"
+                radius-inner="0.16" radius-outer="0.21"
+                material="color:#ffffff;opacity:.92;transparent:true"
+                animation="property:rotation;to:0 0 360;loop:true;dur:2500;easing:linear">
+        </a-ring>
+      </a-entity>
+
+      <a-entity mindar-image-target="targetIndex:1"
+                multi-target-events="name:ADVENTURE">
+        <a-box position="0 0 0.08"
+               scale=".22 .22 .22"
+               material="color:#ffffff;opacity:.92;transparent:true"
+               animation="property:rotation;to:360 360 0;loop:true;dur:3000;easing:linear">
+        </a-box>
+      </a-entity>
+
+    </a-scene>
+  </div>
 </body>
 </html>
