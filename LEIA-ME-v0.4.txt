@@ -1,0 +1,24 @@
+CEEJA • MindAR Pong v0.4
+CÂMERA NATIVA DO MINDAR + ESCALA A5
+
+Por que existe esta versão:
+A v0.3 tentou forçar manualmente CSS no <video> e no canvas.
+Isso entrou em conflito com o próprio MindAR, que calcula e aplica
+as dimensões/posição da câmera automaticamente. Em alguns celulares,
+o resultado foi tela branca.
+
+Nesta v0.4:
+- NÃO há CSS manual sobre o vídeo da câmera;
+- NÃO há CSS manual sobre o canvas do A-Frame;
+- o MindAR gerencia o enquadramento da câmera;
+- a cena fica dentro de um container absoluto 100% x 100%, como nos exemplos oficiais;
+- a redução de escala pensada para A5 foi mantida;
+- Pong, 3 vidas, pontuação, toque e Jogar novamente foram preservados;
+- botão VR continua desativado.
+
+IMPORTANTE:
+Use exatamente o mesmo targets.mind que já funcionou.
+Ele deve continuar na mesma pasta do index.html no GitHub Pages.
+
+Para testar sem cache:
+adicione ?v=04 ao endereço do site.
