@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>CEEJA • MindAR Pong v0.4 • câmera nativa do MindAR</title>
+<title>CEEJA • MindAR Pong v0.5 • otimizado</title>
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turbowarp/scaffolding@0.4.0/dist/scaffolding-min.js"></script>
@@ -45,6 +45,16 @@ async function loadLocalPong(){
    scaffolding.resizeMode='preserve-ratio';
    scaffolding.setup();
    scaffolding.appendTo(document.getElementById('project'));
+
+   // O tamanho interno do palco é fixo; não precisamos recalcular layout a cada frame.
+   const relayoutScratch=()=>{
+     if(scaffolding && scaffolding.relayout){
+       try{scaffolding.relayout();}catch(e){}
+     }
+   };
+   window.addEventListener('resize',relayoutScratch,{passive:true});
+   window.addEventListener('orientationchange',()=>setTimeout(relayoutScratch,250),{passive:true});
+   setTimeout(relayoutScratch,50);
    const response=await fetch('./pong.sb3',{cache:'no-store'});
    if(!response.ok)throw new Error('pong.sb3 HTTP '+response.status);
    const project=await response.arrayBuffer();
@@ -100,10 +110,20 @@ async function loadLocalPong(){
      if(e.touches && e.touches[0]) applyControl(e.touches[0].clientX,e.touches[0].clientY);
      e.preventDefault();
    };
+   let pendingTouch=null, touchRAF=0;
+   const flushTouch=()=>{
+     touchRAF=0;
+     if(!pendingTouch) return;
+     applyControl(pendingTouch.x,pendingTouch.y);
+     pendingTouch=null;
+   };
    const onTouchMove=e=>{
      if(isGameOverControl(e)) return;
      if(document.getElementById('gameWrap').style.display==='none') return;
-     if(e.touches && e.touches[0]) applyControl(e.touches[0].clientX,e.touches[0].clientY);
+     if(e.touches && e.touches[0]){
+       pendingTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};
+       if(!touchRAF) touchRAF=requestAnimationFrame(flushTouch);
+     }
      e.preventDefault();
    };
    const onTouchEnd=e=>{
@@ -142,7 +162,7 @@ async function loadLocalPong(){
      }
    }
    if(window.__pongHudTimer) clearInterval(window.__pongHudTimer);
-   window.__pongHudTimer=setInterval(refreshHud,100);
+   window.__pongHudTimer=setInterval(refreshHud,160);
 
    let restartBusy=false;
    function restartGame(e){
@@ -192,8 +212,14 @@ AFRAME.registerComponent('scratch-surface-mindar',{
      this.status.textContent='📷 Aponte para a capa do PONG';
    });
  },
- tick:function(){
+ tick:function(time){
    if(!this.targetVisible || this.wrap.style.display==='none') return;
+
+   // Atualiza a posição do jogo em ~30 fps.
+   // O MindAR continua rastreando normalmente; reduzimos apenas o custo do overlay HTML.
+   if(this.lastTick && (time-this.lastTick)<33) return;
+   this.lastTick=time;
+
    const cam=this.el.sceneEl.camera;
    if(!cam) return;
    const W=innerWidth, H=innerHeight;
@@ -235,7 +261,7 @@ AFRAME.registerComponent('scratch-surface-mindar',{
 
    this.wrap.style.transform=`translate3d(${this.fx-240}px,${this.fy-180}px,0) scale(${this.fs})`;
    window.__scratchSurfaceTransform={cx:this.fx, cy:this.fy, angRad:0, sx:this.fs, sy:this.fs};
-   if(scratchReady && scaffolding) scaffolding.relayout();
+   /* relayout removido do loop: o gameWrap muda só por CSS transform. */
  }
 });
 
@@ -248,7 +274,7 @@ window.addEventListener('error',(e)=>{
 </script>
 </head>
 <body>
-<div id="top"><strong>CEEJA • MindAR Pong v0.4</strong><br>Capa do Pong como alvo • câmera gerenciada pelo próprio MindAR.</div>
+<div id="top"><strong>CEEJA • MindAR Pong v0.5</strong><br>Capa do Pong como alvo • versão otimizada para celulares.</div>
 <div id="status">📷 Aponte para a capa do PONG</div>
 <div id="gameWrap">
   <div id="project"></div>
@@ -262,7 +288,7 @@ window.addEventListener('error',(e)=>{
 <a-scene
   mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; maxTrack: 1; filterMinCF: 0.001; filterBeta: 0.01; warmupTolerance: 5; missTolerance: 5;"
   color-space="sRGB"
-  renderer="colorManagement: true, physicallyCorrectLights"
+  renderer="antialias: false; colorManagement: false"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
   embedded>
@@ -270,7 +296,6 @@ window.addEventListener('error',(e)=>{
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
   <a-entity mindar-image-target="targetIndex: 0" scratch-surface-mindar>
-    <a-plane position="0 0 0" width="1" height="1.5" material="opacity:0; transparent:true"></a-plane>
   </a-entity>
 </a-scene>
 </div>

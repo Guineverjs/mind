@@ -1,0 +1,28 @@
+CEEJA • MindAR Pong v0.5 — OTIMIZADO
+
+Base: v0.4, que já mostrou corretamente a câmera e o Pong.
+
+O que foi otimizado:
+- A posição/escala do overlay HTML agora é atualizada em ~30 fps, em vez de todo frame.
+- Scaffolding.relayout() NÃO roda mais continuamente.
+- O relayout só acontece ao carregar e quando a tela/orientação muda.
+- touchmove é agrupado por requestAnimationFrame, evitando excesso de chamadas ao Scratch VM.
+- HUD de vidas/pontos passa de 100 ms para 160 ms.
+- antialias do A-Frame foi desligado; não usamos objetos 3D que precisem dele.
+- plano transparente desnecessário foi removido.
+- Todo o comportamento do jogo foi preservado.
+
+Mantido:
+- MindAR e mesma capa/targets.mind.
+- Câmera nativa do MindAR.
+- Escala ajustada para A5.
+- 3 vidas e pontuação.
+- Arrastar para mover a raquete.
+- Jogar novamente.
+- Billboard visual.
+
+Use o MESMO targets.mind que já está funcionando.
+
+Para testar sem cache:
+? v=05 (sem espaço), por exemplo:
+https://guineverjs.github.io/mind/?v=05
