@@ -1,0 +1,29 @@
+CEEJA • MindAR Pong v0.3
+CÂMERA VISÍVEL + ESCALA AJUSTADA PARA A5
+
+Base:
+- v0.2 já comprovou que a capa do Pong reconhece e abre o jogo.
+- pong.sb3 foi preservado.
+- 3 vidas, pontuação, controle por toque e Jogar novamente foram preservados.
+
+Mudanças da v0.3:
+1. Fundo da página e canvas do A-Frame ficaram transparentes.
+2. O vídeo ao vivo da câmera é mantido atrás da camada AR.
+3. renderer usa alpha:true.
+4. Pong ficou menor em relação à capa.
+5. Escala máxima foi reduzida para evitar o jogo "explodir" ao aproximar o celular.
+6. O botão VR continua oculto.
+
+IMPORTANTE:
+Este pacote NÃO inclui targets.mind porque esse arquivo foi compilado por você.
+Use exatamente o MESMO targets.mind que já funcionou no teste anterior.
+
+Para atualizar no GitHub Pages:
+- substitua index.html
+- substitua pong.sb3 se desejar manter tudo sincronizado
+- mantenha/mande novamente pong-capa.jpg
+- mantenha o targets.mind que já está no repositório
+- abra com ?v=03 para evitar cache antigo
+
+Objetivo visual:
+câmera ao vivo visível ao redor + Pong menor e centralizado sobre a capa.
